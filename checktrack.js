@@ -17,7 +17,6 @@ const dossierProjet = join(
   "trackada",
 );
 
-
 //2-Vérifier que le dossier existe.S'il n'existe pas
 
 function verifierProjet(project) {
@@ -46,7 +45,6 @@ function verifierProjet(project) {
   return erreurs;
 }
 
-
 // -> il manque a, b et c
 
 function formaterListe(elements) {
@@ -65,6 +63,15 @@ function lancerVerification() {
   } else {
     console.log("❌dossier ada");
   }
+  // Ici il faut reformater l'array manquant pour avoir un affichage correct
+  track.projects.forEach((project) => {
+    const erreurs = verifierProjet(project);
+    if (erreurs.length === 0) {
+      console.log(`✅ dossier du projet $ {projet.ada}`);
+      erreurs.forEach((erreur) => console.log(`- ${erreur}`));
+    }
+  });
+  console.log("");
 }
 
 //3 récupérer tout les projets dans le json
@@ -88,28 +95,17 @@ const symnbole = projetsCorrects === total ? "✅" : "❌";
 
 const message = "${pourcentage}% des projets sont initialisés correctement";
 
-// Ici il faut reformater l'array manquant pour avoir un affichage correct
-track.projects.forEach((project) => {
-  const erreurs = verifierProjet(project);
-  if (erreurs.length === 0) {
-    console.log(`✅ dossier du projet $ {projet.ada}`);
-    erreurs.forEach((erreur) => console.log(`- ${erreur}`));
-  }
-});
-console.log("");
-
 //readline pose la question
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
- 
+
 rl.question("Lancer la vérification ? (o/n) ", (reponse) => {
-    if (reponse === "o") { 
-        lancerVerification ()
-    } else {
-        console.log("pas de vérifictation");
-        
-    }
+  if (reponse === "o") {
+    lancerVerification();
+  } else {
+    console.log("pas de vérifictation");
+  }
   rl.close();
 });
