@@ -23,6 +23,7 @@ function verifierProjet(project) {
   const erreurs = [];
   //on récupère le chemin de chaque projet
   const cheminProjet = join(dossierProjet, project.name);
+  console.log(cheminProjet)
   // Condition pour savoir si le projet existe dans mon dossier ou non
 
   if (!existsSync(cheminProjet)) {
@@ -56,7 +57,8 @@ function formaterListe(elements) {
   return `${debut} et ${dernier}`;
 }
 
-function lancerVerification() {
+function lancerVerification() { 
+    let projetsCorrects = 0
   // On vérifie si le dossier Ada existe et on affiche
   if (existsSync(dossierProjet)) {
     console.log("✅dossier ada");
@@ -65,13 +67,21 @@ function lancerVerification() {
   }
   // Ici il faut reformater l'array manquant pour avoir un affichage correct
   track.projects.forEach((project) => {
+    console.log(project)
     const erreurs = verifierProjet(project);
+    erreurs.forEach((erreur) => console.log(`- ${erreur}`));
     if (erreurs.length === 0) {
-      console.log(`✅ dossier du projet $ {projet.ada}`);
-      erreurs.forEach((erreur) => console.log(`- ${erreur}`));
+      console.log(`✅ dossier du projet ${project.name}`);
+      projetsCorrects++
     }
   });
   console.log("");
+
+  const total = track.projects.length;
+  const pourcentage = Math.round((projetsCorrects / total) * 100);
+  const symnbole = projetsCorrects === total ? "✅" : "❌";
+
+  const message = "${pourcentage}% des projets sont initialisés correctement";
 }
 
 //3 récupérer tout les projets dans le json
@@ -79,21 +89,7 @@ function lancerVerification() {
 const projects = track.projects;
 //on prend les projets un par un
 
-track.projects.forEach((project) => {
-  const cheminProjet = join(dossierProjet, project.name);
-  if (existsSync(cheminProjet)) {
-    console.log(`✅ dossier du projet ${project.name}`);
-  } else {
-    console.log(`❌ dossier du projet ${project.name}`);
-  }
-  console.log("");
-});
 //
-const total = track.projects.length;
-const pourcentage = Math.round((projetsCorrects / total) * 100);
-const symnbole = projetsCorrects === total ? "✅" : "❌";
-
-const message = "${pourcentage}% des projets sont initialisés correctement";
 
 //readline pose la question
 const rl = readline.createInterface({
