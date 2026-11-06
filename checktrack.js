@@ -2,106 +2,119 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 import readline from "readline";
-//----Chargement-----//
-
-//1-afficher le projet //
-
-const track = JSON.parse(readFileSync("track.json", "utf-8")); //Récupère (parser) ou charge le fichier JSON
-const dossierProjet = join(
-  homedir(),
-  "Documents",
-  "ADA",
-  "ada-tech",
-  "bloc1",
-  "projets",
-  "trackada",
-);
-
-//2-Vérifier que le dossier existe.S'il n'existe pas
-
-function verifierProjet(project) {
-  const erreurs = [];
-  //on récupère le chemin de chaque projet
-  const cheminProjet = join(dossierProjet, project.name);
-  console.log(cheminProjet)
-  // Condition pour savoir si le projet existe dans mon dossier ou non
-
-  if (!existsSync(cheminProjet)) {
-    erreurs.push("Le dossier existe pas ou est mal nommé");
-    return erreurs;
-  }
-  if (!existsSync(join(cheminProjet, ".git"))) {
-    erreurs.push("le repository git n'est pas initialisé");
-  }
-
-  const manquants = [];
-  project.required.forEach((file) => {
-    if (!existsSync(join(cheminProjet, file))) {
-      manquants.push(file);
-    }
-  });
-
-  // -> il manque a, b et c
-  erreurs.push(manquants);
-  return erreurs;
-}
-
-// -> il manque a, b et c
-
+//assemblage des éléments
 function formaterListe(elements) {
-  if (elements.length === 1) {
-    return elements[0];
-  }
-  const debut = elements.slice(0, -1);
-  const dernier = elements[elements.length - 1];
-  return `${debut} et ${dernier}`;
-}
-
-function lancerVerification() { 
-    let projetsCorrects = 0
-  // On vérifie si le dossier Ada existe et on affiche
-  if (existsSync(dossierProjet)) {
-    console.log("✅dossier ada");
-  } else {
-    console.log("❌dossier ada");
-  }
-  // Ici il faut reformater l'array manquant pour avoir un affichage correct
-  track.projects.forEach((project) => {
-    console.log(project)
-    const erreurs = verifierProjet(project);
-    erreurs.forEach((erreur) => console.log(`- ${erreur}`));
-    if (erreurs.length === 0) {
-      console.log(`✅ dossier du projet ${project.name}`);
-      projetsCorrects++
+    if (elements.length === 1) {
+        return elements[0];
     }
-  });
-  console.log("");
-
-  const total = track.projects.length;
-  const pourcentage = Math.round((projetsCorrects / total) * 100);
-  const symnbole = projetsCorrects === total ? "✅" : "❌";
-
-  const message = "${pourcentage}% des projets sont initialisés correctement";
+    const dernier = elements.pop()
+    return elements.join(", ") + " et " + dernier
+        
 }
+      //----Chargement-----//
 
-//3 récupérer tout les projets dans le json
+        //1-afficher le projet //
 
-const projects = track.projects;
-//on prend les projets un par un
+const verifierProjet = () => {
+           
+    const dossierProjet = join(
+        homedir(),
+        "Documents",
+        "ADA",
+        "ada-tech",
+        "bloc1",
+        "projets",
+        "trackada" 
+    ); 
 
-//
+    if(existsSync(dossierProjet)) {
+        const verification = readFileSync(dossierProjet, "utf-8")
+        console.log(verification);
+            
+        //2-Vérifier que le dossier existe.S'il n'existe pas
+          
+        const track = JSON.parse(verification)
+        console.log(track); 
+         //Récupère (parser) ou charge le fichier JSON
+        
+            
+           
+        //on récupère le chemin de chaque projet
+        const cheminProjet = join(homedir(),"ADA","ada-tech","bloc1","projets");
+        console.log(cheminProjet);
+            // Condition pour savoir si le projet existe dans mon dossier ou non
 
+        if (!existsSync(cheminProjet)) {
+            console.log(`❌Le dossier existe pas: ${cheminProjet}`);
+        } else { 
+            console.log(`✅ Le dossier existe: ${cheminProjet}`); 
+        }
+            //vérification projet
+        let  projetsCorrects = 0
+        const total = track.projects.length;
+
+        track.projects.forEach((file) => {
+            const erreur = []
+            const cheminProjets = join(cheminProjet, file.name)
+            if (!existsSync(cheminProjets, )) {
+                 erreur.push("Le dossier n'existe pas ou mal nommé")
+            } else { 
+            
+                    //3 Vérifier si le projet est un dépot git
+                const routeGit = join(cheminProjets, ".git")
+                if (!existsSync(routeGit)) {
+                     erreur.push("le repository git n'est pas initialisé"); 
+                } 
+                    //4 Vérifier chaque projet contient les fichiers requis
+                const inexistant = file.required.filter((fichier) => {
+                    const routeFin = join(cheminProjets, fichier) 
+                    return !existsSync(routeFin)
+                });
+
+                if (inexistant.length > 0) {
+                    erreur.push(`Il manque ${formaterListe(inexistant)}`)
+                
+                }
+            
+            }
+                // 5 Afficher les résultats
+            if (erreur.length > 0) {
+                //  afficher les érreurs
+                console.log(`❌ dossier du projet ${file.name}`);
+                erreur.forEach((erreur) => { 
+                    console.log(`- ${erreur}`) 
+                });
+            } else {
+                console.log(`✅ dossier du projet ${file.name}`)
+                projetsCorrects++;
+            }
+                console.log("");
+                
+            });
+            //Pourcentage de fichier correct
+            const pourcentage = Math.round((projetsCorrects / total) * 100);
+            console.log(`📊 ${pourcentage}% des projets sont initialisés correctements (${projetsCorrects}/ ${total})`) 
+        } else {
+            console.log(`❌ le fichier track.json introuvable : ${dossierProjet}`)
+            return
+        }                       
+};
+
+        
 //readline pose la question
 const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
+    input: process.stdin,
+    output: process.stdout,
 });
 
 rl.question("Lancer la vérification ? (o/n) ", (reponse) => {
-  if (reponse === "o") {
-    lancerVerification();
-  } else {
-    console.log("pas de vérifictation");
-  }
-  rl.close();
+    if (reponse.toLowerCase() === "o") {
+        console.log("vérification")
+        verifierProjet();
+    } else {
+        console.log("pas de vérifictation");
+    }
+    rl.close();
 });
+
+ 

@@ -19,7 +19,4 @@ Il affiche si le dossier existe ou si il n'existe pas, le depot Git n'est pas in
 
 ## Commande(s) à compléter
 Exemple d'affichage
-<!-- À faire À LA FIN : lance ton script, copie ce que le terminal affiche, colle-le dans le bloc ci-dessous. -->
-(colle ici ton résultat)
-Ce que je ferais avec une semaine de plus
-<!-- 2 ou 3 idées concrètes. Tu peux t'inspirer des bonus de l'énoncé, ou de ce que tu as trouvé difficile ou pas terminé. -->
+Ne fonctionne pas dans le terminal, je me suis fait aider par un collègue de classe mais nous ne voyons pas ou ce trouve l'érreur.
